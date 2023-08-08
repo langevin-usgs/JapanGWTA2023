@@ -1,6 +1,30 @@
 # JapanGWTA2023
 
-## Example 1 -- Toth Flow System
+## Software Installation
+
+Lecture attendees may wish to follow along by running the FloPy/MODFLOW 6 examples.  This will require that software be installed prior to the lecture.  Required software includes:
+
+1.  Python (preferably 3.10 or newer).  [Miniconda](https://docs.conda.io/en/latest/miniconda.html) is a popular Python distribution that runs on Windows, Mac, and Linux.
+2.  FloPy Python package.  This can be installed using
+
+```
+$ conda install flopy
+```
+
+or
+
+```
+$ pip install flopy
+```
+
+3.  MODFLOW executables and related programs.  After FloPy has been installed, MODFLOW executables can be downloaded to your computer using the [get-modflow](https://github.com/modflowpy/flopy/blob/develop/docs/get_modflow.md) utility, which is installed with FloPy. The following command is one way to use `get-modflow`, which will download the executables and make them available for use with FloPy scripts.
+
+```
+$ get-modflow :flopy 
+```
+
+## Examples using FloPy and MODFLOW 6
+### Example 1 -- Toth Flow System
 
 ```
 import matplotlib.pyplot as plt
@@ -72,7 +96,7 @@ ax.set_ylim(0, 11000)
 ax.plot(x, z)
 ```
 
-## Example 2 -- Voronoi Grid
+### Example 2 -- Voronoi Grid
 
 ```
 import pathlib as pl
