@@ -1,12 +1,12 @@
 # JapanGWTA2023
 
-Example 1 -- Toth Flow System
+## Example 1 -- Toth Flow System
 
 ```
 import matplotlib.pyplot as plt
 import numpy as np
 import flopy
-ws = './ex2'
+ws = './ex1'
 name = 'mymodel'
 
 def get_z(z0, a, b, alpha, x):
