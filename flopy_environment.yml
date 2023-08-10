@@ -1,0 +1,34 @@
+name: flopy
+
+channels:
+  - conda-forge
+
+dependencies:
+  - python>=3.8
+  - numpy>=1.15.0
+  - matplotlib>=1.4.0
+  - flopy
+  - python-dateutil>=2.4.0
+  - affine
+  - scipy
+  - pandas
+  - pyshp
+  - rasterio
+  - fiona
+  - descartes
+  - pyproj
+  - shapely>=1.8
+  - geos
+  - geojson
+  - vtk
+  - rasterstats
+  - pyvista
+  - imageio
+  - pymetis
+  - trame
+  - jupyter
+
+  # pip installations
+  - pip
+  - pip:
+      - git+https://github.com/MODFLOW-USGS/modflowapi.git
