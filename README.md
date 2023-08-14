@@ -216,3 +216,131 @@ pmv.plot_bc(ftype="CHD")
 pmv.plot_vector(qx, qy, qz, normalize=True, color="black")
 pmv.contour_array(head)
 ```
+
+### Example 3 -- Local Grid Refinement
+
+```
+import pathlib as pl
+import matplotlib.pyplot as plt
+import numpy as np
+import flopy
+from flopy.utils.lgrutil import Lgr
+
+ws = './ex3'
+name = 'mymodel'
+
+nlayp = 1
+nrowp = 10
+ncolp = 10
+delrp = 1
+delcp = 1
+topp = np.ones((nrowp, ncolp), dtype=float)
+botmp = np.zeros((nlayp, nrowp, ncolp), dtype=float)
+idomainp = np.ones((nlayp, nrowp, ncolp), dtype=int)
+idomainp[:, 2:8, 2:8] = 0
+
+lgr = Lgr(
+    nlayp,
+    nrowp,
+    ncolp,
+    delrp,
+    delcp,
+    topp,
+    botmp,
+    idomainp,
+    ncpp=3,
+    ncppl=[3],
+    xllp=0.0,
+    yllp=0.0,
+)
+
+sim = flopy.mf6.MFSimulation(sim_name=name, sim_ws=ws, exe_name='mf6')
+tdis = flopy.mf6.ModflowTdis(sim)
+ims = flopy.mf6.ModflowIms(sim)
+
+# parent model
+name = "parent"
+gwf = flopy.mf6.ModflowGwf(sim, modelname=name, save_flows=True)
+dis = flopy.mf6.ModflowGwfdis(
+    gwf, 
+    nlay=nlayp, 
+    nrow=nrowp, 
+    ncol=ncolp, 
+    delr=delrp, 
+    delc=delcp,
+    top=topp,
+    botm=botmp,
+    idomain=idomainp,
+)
+ic = flopy.mf6.ModflowGwfic(gwf)
+npf = flopy.mf6.ModflowGwfnpf(gwf, save_specific_discharge=True)
+chd = flopy.mf6.ModflowGwfchd(gwf, stress_period_data=[[(0, 0, 0), 1.],
+                                                       [(0, 9, 9), 0.]])
+budget_file = name + '.bud'
+head_file = name + '.hds'
+oc = flopy.mf6.ModflowGwfoc(gwf,
+                            budget_filerecord=budget_file,
+                            head_filerecord=head_file,
+                            saverecord=[('HEAD', 'ALL'), ('BUDGET', 'ALL')])
+gwf_parent = gwf
+
+# child model
+name = "child"
+gwf = flopy.mf6.ModflowGwf(sim, modelname=name, 
+                           save_flows=True)
+dis = flopy.mf6.ModflowGwfdis(
+    gwf, 
+    nlay=lgr.nlay, 
+    nrow=lgr.nrow, 
+    ncol=lgr.ncol, 
+    delr=lgr.delr, 
+    delc=lgr.delc,
+    top=lgr.top,
+    botm=lgr.botm,
+    xorigin=lgr.xll,
+    yorigin=lgr.yll,
+)
+ic = flopy.mf6.ModflowGwfic(gwf)
+npf = flopy.mf6.ModflowGwfnpf(gwf, save_specific_discharge=True)
+budget_file = name + '.bud'
+head_file = name + '.hds'
+oc = flopy.mf6.ModflowGwfoc(gwf,
+                            budget_filerecord=budget_file,
+                            head_filerecord=head_file,
+                            printrecord=[('HEAD', 'ALL'), ('BUDGET', 'ALL')],
+                            saverecord=[('HEAD', 'ALL'), ('BUDGET', 'ALL')],
+)
+gwf_child = gwf
+
+# setup the exchange
+exchangedata = lgr.get_exchange_data(
+    angldegx=True, 
+    cdist=True
+)
+flopy.mf6.ModflowGwfgwf(sim, 
+                        exgmnamea="parent",
+                        exgmnameb="child",
+                        xt3d=True,
+                        nexg=len(exchangedata),
+                        auxiliary=["ANGLDEGX", "CDIST"],
+                        exchangedata=exchangedata)
+
+sim.write_simulation()
+sim.run_simulation()
+
+fig, ax = plt.subplots(1, 1)
+ax.set_aspect("equal")
+for iplot, gwf in enumerate([gwf_child, gwf_parent]):
+    head = gwf.output.head().get_data()
+    bud = gwf.output.budget()
+    spdis = bud.get_data(text='DATA-SPDIS')[0]
+    qx, qy, qz = flopy.utils.postprocessing.get_specific_discharge(spdis, gwf)
+
+    pmv = flopy.plot.PlotMapView(gwf, ax=ax)
+    c = pmv.plot_array(head, vmin=0, vmax=1)
+    pmv.plot_grid(colors='white')
+    pmv.contour_array(head, levels=[.2, .4, .6, .8], linewidths=3.)
+    pmv.plot_vector(qx, qy, normalize=True, color="white")
+plt.colorbar(c, shrink=0.5)
+```
+
