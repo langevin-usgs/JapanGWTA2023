@@ -1,4 +1,10 @@
+![alt](images/header.png)
+
 # JapanGWTA2023
+
+This repository contains information for a lecture to the Japan Ground Water Technology Association.  The purpose of the lecture is to present recent advances for the MODFLOW 6 groundwater simulator.
+
+![alt](images/grid.png)
 
 ## Software Installation
 
