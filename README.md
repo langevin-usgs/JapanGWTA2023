@@ -309,9 +309,10 @@ sim = flopy.mf6.MFSimulation(sim_name=name, sim_ws=ws, exe_name='mf6')
 tdis = flopy.mf6.ModflowTdis(sim)
 ims = flopy.mf6.ModflowIms(sim, print_option="all", inner_maximum=100)
 gwf = flopy.mf6.ModflowGwf(sim, modelname=name, save_flows=True)
+gridprops_disv = g.get_gridprops_disv()
 disv = flopy.mf6.ModflowGwfdisv(
-    gwf, **g.get_gridprops_disv())
-ic = flopy.mf6.ModflowGwfic(gwf, strt=top)
+    gwf, **gridprops_disv)
+ic = flopy.mf6.ModflowGwfic(gwf, strt=gridprops_disv["top"])
 npf = flopy.mf6.ModflowGwfnpf(gwf, save_specific_discharge=True)
 
 gi = flopy.utils.GridIntersect(gwf.modelgrid)
@@ -593,12 +594,13 @@ for iplot, gwf in enumerate([gwf_child, gwf_parent]):
     qx, qy, qz = flopy.utils.postprocessing.get_specific_discharge(spdis, gwf)
 
     pmv = flopy.plot.PlotMapView(gwf, ax=ax)
+    c = pmv.plot_array(head, masked_values=[1.e30])
+    if iplot == 0:
+        pmv.plot_grid(colors='black')
     if iplot == 1:
         pmv.plot_bc(ftype="CHD")
         pmv.plot_vector(qx, qy, normalize=True, color="black")
-    #c = pmv.plot_array(head, masked_values=[1.e30])
-    #pmv.plot_grid(colors='black')
-    pmv.contour_array(head)
+    pmv.contour_array(head, colors="blue")
 plt.colorbar(c, shrink=0.5)
 ```
 
