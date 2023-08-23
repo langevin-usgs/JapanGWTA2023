@@ -797,8 +797,8 @@ plt.tight_layout()
 
 ```
 # create and run transient transport simulation using flow results
-ws_flow = pl.Path(ws, "flow")
-sim = flopy.mf6.MFSimulation(sim_name=name, sim_ws=ws_flow, exe_name='mf6')
+ws_transport = pl.Path(ws, "transport")
+sim = flopy.mf6.MFSimulation(sim_name=name, sim_ws=ws_transport, exe_name='mf6')
 tdis = flopy.mf6.ModflowTdis(sim, nper=1, perioddata=[(36500., 100, 1.0)])
 ims = flopy.mf6.ModflowIms(sim, print_option="all", linear_acceleration="BICGSTAB", inner_maximum=100)
 gwt = flopy.mf6.ModflowGwt(sim, modelname=name, save_flows=True)
