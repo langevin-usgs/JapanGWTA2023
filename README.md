@@ -12,7 +12,7 @@ See software installation instructions [here](./software.md).
 
 ## Examples
 
-[Example 1 -- Toth Flow System](./scripts/ex1.py)
+Example 1 -- Toth Flow System [script](./scripts/ex1.py) and [notebook](./notebooks/ex1.ipynb)
 
 ## Examples using FloPy and MODFLOW 6
 ### Example 1 -- Toth Flow System
